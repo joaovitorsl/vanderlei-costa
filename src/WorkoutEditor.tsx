@@ -4,8 +4,7 @@ import Modal from './Modal';
 import {type Workout} from './data';
 import {fieldError, formErrors} from './formValidation';
 
-type NumberField = 'distance' | 'reps' | 'duration' | 'rest' | 'warmup' | 'cooldown';
-type Draft = Omit<Workout, NumberField> & Record<NumberField, number | ''>;
+import {cleanWorkout, changeWorkoutType, type Draft, type NumberField} from './workoutState';
 type Field = {key: NumberField; label: string; min: number; step: number} | {key: 'pace' | 'target'; label: string; placeholder: string};
 const typeFields: Record<string, Field[]> = {
   Rodagem: [{key:'distance', label:'Distância (km)', min:0.1, step:0.1}, {key:'pace', label:'Pace (min/km)', placeholder:'6:30'}],
@@ -14,7 +13,7 @@ const typeFields: Record<string, Field[]> = {
 };
 const commonFields: Field[] = [{key:'warmup', label:'Aquecimento (min)', min:0, step:0.1}, {key:'cooldown', label:'Desaquecimento (min)', min:0, step:0.1}];
 export default function WorkoutEditor({initial, subtitle, editing, onClose, onSave}: {initial: Workout; subtitle: string; editing: boolean; onClose: () => void; onSave: (w: Workout) => void}) {
-  const [workout, setWorkout] = useState<Draft>(() => ({...initial}));
+  const [workout, setWorkout] = useState<Draft>(() => cleanWorkout({...initial}));
   const [errors, setErrors] = useState<Record<string, string>>({});
   const change = (input: HTMLInputElement | HTMLTextAreaElement) => {
     const {name, value, type} = input;
@@ -27,15 +26,15 @@ export default function WorkoutEditor({initial, subtitle, editing, onClose, onSa
     const nextErrors = formErrors(e.currentTarget);
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length) return;
-    onSave({...workout, title:workout.title.trim(), distance:Number(workout.distance), reps:Number(workout.reps), duration:Number(workout.duration), rest:Number(workout.rest), warmup:Number(workout.warmup), cooldown:Number(workout.cooldown)});
+    onSave(cleanWorkout({...workout, title:workout.title.trim(), distance:Number(workout.distance), reps:Number(workout.reps), duration:Number(workout.duration), rest:Number(workout.rest), warmup:Number(workout.warmup), cooldown:Number(workout.cooldown)}));
   };
-  return <Modal fullScreenOnMobile title={editing ? 'Editar treino' : 'Criar treino'} subtitle={subtitle} onClose={onClose}>
+  return <Modal stickyFooter fullScreenOnMobile title={editing ? 'Editar treino' : 'Criar treino'} subtitle={subtitle} onClose={onClose}>
     <form noValidate onSubmit={submit}>
       <div className="form-fields">
         <label className="full">Nome<input name="title" required value={workout.title} aria-invalid={!!errors.title} aria-describedby={errors.title ? 'workout-title-error' : undefined} onChange={e => change(e.currentTarget)}/>{error('title')}</label>
         <label className="full">Tipo de treino<select value={workout.type} onChange={e => {
           const type = e.currentTarget.value;
-          setWorkout(current => ({...current, type, distance: type === current.type ? current.distance : type === 'Rodagem' ? 5 : current.type === 'Rodagem' ? 200 : current.distance}));
+          setWorkout(current => changeWorkoutType(current, type));
           setErrors({});
         }}>{Object.keys(typeFields).map(type => <option key={type}>{type}</option>)}</select></label>
         {/* Type is part of each key: incompatible controls cannot retain a previous type's DOM state. */}

@@ -25,11 +25,17 @@ export function duplicatePreviousWeek(schedule: Schedule, studentId: string, wee
   const next = {...schedule};
   let count = 0;
   for (const day of days) {
-    const copies = (schedule[scheduleKey(studentId, week - 1, day)] || []).map(cloneWorkout);
+    const copies = (schedule[scheduleKey(studentId, week - 1, day)] || []).map(source => ({...cloneWorkout(source), duplicatedFromWeek:week - 1}));
     if (!copies.length) continue;
     const key = scheduleKey(studentId, week, day);
     next[key] = [...(schedule[key] || []), ...copies];
     count += copies.length;
   }
   return {schedule: next, count};
+}
+
+export type WeekCopies = Record<string, number>;
+export function hasCopiedPreviousWeek(schedule: Schedule, history: WeekCopies, studentId: string, week: number): boolean {
+  return history[`${studentId}:${week}`] === week - 1 || days.some(day =>
+    (schedule[scheduleKey(studentId, week, day)] || []).some(workout => workout.duplicatedFromWeek === week - 1));
 }

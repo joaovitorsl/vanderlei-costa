@@ -1,4 +1,4 @@
-import {useEffect, useId, useRef, type ReactNode} from 'react';
+import {useEffect, useLayoutEffect, useId, useRef, type ReactNode} from 'react';
 import {ArrowLeft, X} from 'lucide-react';
 
 type Props = {
@@ -7,22 +7,26 @@ type Props = {
   onClose: () => void;
   children: ReactNode;
   compact?: boolean;
+  stickyFooter?: boolean;
   fullScreenOnMobile?: boolean;
 };
 
-export default function Modal({title, subtitle, onClose, children, compact = false, fullScreenOnMobile = false}: Props) {
+export default function Modal({title, subtitle, onClose, children, compact = false, stickyFooter = false, fullScreenOnMobile = false}: Props) {
   const ref = useRef<HTMLElement>(null);
   const overlay = useRef<HTMLDivElement>(null);
   const close = useRef(onClose);
   close.current = onClose;
   const id = useId();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const before = document.activeElement as HTMLElement | null;
+    const padding = document.body.style.paddingRight;
+    const scrollbar = window.innerWidth - document.documentElement.clientWidth;
     const overflow = document.body.style.overflow;
     const background = document.querySelector<HTMLElement>('.app');
     const wasInert = background?.inert ?? false;
     if (background) background.inert = true;
+    if(scrollbar) document.body.style.paddingRight = `${scrollbar}px`;
     document.body.style.overflow = 'hidden';
     Array.from(ref.current?.querySelectorAll<HTMLElement>('button') || []).find(el => el.offsetParent !== null)?.focus({preventScroll:true});
     const handler = (e: KeyboardEvent) => {
@@ -41,6 +45,7 @@ export default function Modal({title, subtitle, onClose, children, compact = fal
     document.addEventListener('keydown', handler);
     return () => {
       document.body.style.overflow = overflow;
+      document.body.style.paddingRight = padding;
       if (background) background.inert = wasInert;
       document.removeEventListener('keydown', handler);
       if (before?.isConnected) before.focus({preventScroll:true});
@@ -84,7 +89,7 @@ export default function Modal({title, subtitle, onClose, children, compact = fal
   }, [fullScreenOnMobile]);
 
   return <div ref={overlay} className={`overlay ${fullScreenOnMobile ? 'form-overlay' : ''}`} onClick={onClose}>
-    <section ref={ref} className={`sheet ${compact ? 'compact-sheet' : ''} ${fullScreenOnMobile ? 'form-sheet' : ''}`} role="dialog" aria-modal="true" aria-labelledby={id} onClick={e => e.stopPropagation()}>
+    <section ref={ref} className={`sheet ${compact ? 'compact-sheet' : ''} ${stickyFooter ? 'sticky-footer-sheet' : ''} ${fullScreenOnMobile ? 'form-sheet' : ''}`} role="dialog" aria-modal="true" aria-labelledby={id} onClick={e => e.stopPropagation()}>
       <div className="sheet-header">
         {fullScreenOnMobile && <button type="button" className="icon-button form-back" onClick={onClose} aria-label="Voltar sem salvar"><ArrowLeft size={22}/></button>}
         <div><h2 id={id}>{title}</h2>{subtitle && <p>{subtitle}</p>}</div>

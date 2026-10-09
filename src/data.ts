@@ -8,6 +8,7 @@ export type Student = {
   medical: string; notes: string;
 };
 export type Workout = {
+  duplicatedFromWeek?: number;
   id: string; type: string; title: string; warmup: number; reps: number;
   distance: number; target: string; rest: number; cooldown: number;
   pace: string; duration: number; notes: string;
@@ -18,8 +19,8 @@ export const days = [1, 3, 6] as const; // Offsets from Monday: Tuesday, Thursda
 export const dayNames: Record<number, string> = {1: 'Terça', 3: 'Quinta', 6: 'Domingo'};
 export const weekDate = (week: number, day: number) => new Date(2026, 9, 5 + week * 7 + day, 12);
 export const shortDate = (date: Date) => date.toLocaleDateString('pt-BR', {day: '2-digit', month: 'short'}).replace(' de ', ' ').replace('.', '');
-export const dateLabel = (date: string) => date ? new Date(date + 'T12:00:00').toLocaleDateString('pt-BR') : 'Não informada';
-export const money = (n: number) => n.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+export const dateLabel = (date: string) => date && Number.isFinite(new Date(date + 'T12:00:00').getTime()) ? new Date(date + 'T12:00:00').toLocaleDateString('pt-BR') : 'Não informada';
+export const money = (n: number) => Number.isFinite(n) ? n.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}) : 'Não informado';
 export const initials = (name: string) => name.trim().split(/\s+/).map(n => n[0]).slice(0, 2).join('');
 export const scheduleKey = (id: string, week: number, day: number) => `${id}:${week}:${day}`;
 export const normalize = (text: string) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
