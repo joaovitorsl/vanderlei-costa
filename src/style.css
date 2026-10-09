@@ -58,3 +58,17 @@
   .icon-button:hover{background:#c2e7a111}
   .back-button:hover,.text-button:hover{color:var(--primary)}
 }
+
+/* V4: validation, safe areas and resilient text, within the approved layout. */
+.field-error{font-size:12px;line-height:1.5;color:#ebba8c}
+[aria-invalid=true]{border-color:#d99e79}
+.form-fields label{min-width:0}
+.profile-race>div,.race-list summary>span{min-width:0}
+.row-text small,.profile-race strong,.race-list summary strong,.data-list dd,.delete-context,.workout-summary,.workout-preview strong,.back-button,.medical-note p{overflow-wrap:anywhere}
+.row-text>span{overflow-wrap:anywhere}
+.toast{pointer-events:none}
+@media(max-width:999px){main{padding-bottom:calc(115px + env(safe-area-inset-bottom))}}
+@media(max-width:599px){
+  .overlay.form-overlay{top:var(--form-top,0px);bottom:auto;height:var(--form-height,100dvh);scroll-padding:120px 0 105px}
+  .form-overlay .form-sheet{min-height:100%;padding-top:env(safe-area-inset-top)}
+}

@@ -12,6 +12,7 @@ type Props = {
 
 export default function Modal({title, subtitle, onClose, children, compact = false, fullScreenOnMobile = false}: Props) {
   const ref = useRef<HTMLElement>(null);
+  const overlay = useRef<HTMLDivElement>(null);
   const close = useRef(onClose);
   close.current = onClose;
   const id = useId();
@@ -46,7 +47,43 @@ export default function Modal({title, subtitle, onClose, children, compact = fal
     };
   }, []);
 
-  return <div className={`overlay ${fullScreenOnMobile ? 'form-overlay' : ''}`} onClick={onClose}>
+  useEffect(() => {
+    if (!fullScreenOnMobile || !window.visualViewport) return;
+    const viewport = window.visualViewport;
+    let frame = 0;
+    const fitViewport = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const surface = overlay.current;
+        if (!surface) return;
+        const mobile = window.matchMedia('(max-width:599px)').matches && viewport.scale === 1;
+        surface.style.setProperty('--form-height', mobile ? `${viewport.height}px` : '100dvh');
+        surface.style.setProperty('--form-top', mobile ? `${viewport.offsetTop}px` : '0px');
+        if (!mobile) return;
+        const focused = document.activeElement;
+        if (!(focused instanceof HTMLElement) || !focused.matches('input,select,textarea') || !surface.contains(focused)) return;
+        const bounds = focused.getBoundingClientRect();
+        const header = ref.current?.querySelector('.sheet-header')?.getBoundingClientRect();
+        const actions = ref.current?.querySelector('.sheet-actions')?.getBoundingClientRect();
+        const top = (header?.bottom ?? viewport.offsetTop) + 12;
+        const bottom = Math.min(viewport.offsetTop + viewport.height - 16, actions?.top ?? Infinity) - 12;
+        if (bounds.bottom > bottom) surface.scrollBy({top:bounds.bottom - bottom});
+        else if (bounds.top < top) surface.scrollBy({top:bounds.top - top});
+      });
+    };
+    fitViewport();
+    viewport.addEventListener('resize', fitViewport);
+    viewport.addEventListener('scroll', fitViewport);
+    document.addEventListener('focusin', fitViewport);
+    return () => {
+      cancelAnimationFrame(frame);
+      viewport.removeEventListener('resize', fitViewport);
+      viewport.removeEventListener('scroll', fitViewport);
+      document.removeEventListener('focusin', fitViewport);
+    };
+  }, [fullScreenOnMobile]);
+
+  return <div ref={overlay} className={`overlay ${fullScreenOnMobile ? 'form-overlay' : ''}`} onClick={onClose}>
     <section ref={ref} className={`sheet ${compact ? 'compact-sheet' : ''} ${fullScreenOnMobile ? 'form-sheet' : ''}`} role="dialog" aria-modal="true" aria-labelledby={id} onClick={e => e.stopPropagation()}>
       <div className="sheet-header">
         {fullScreenOnMobile && <button type="button" className="icon-button form-back" onClick={onClose} aria-label="Voltar sem salvar"><ArrowLeft size={22}/></button>}
