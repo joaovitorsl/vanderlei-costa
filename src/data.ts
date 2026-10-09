@@ -68,7 +68,7 @@ export const summary = (w: Workout) => w.type === 'Rodagem'
 export const assessments = [
   {date: '2026-10-02', type: '2400 m', distance: '2400 m', time: '10:42', vo2: '59,1', hr: '185'},
   {date: '2026-07-10', type: '1600 m', distance: '1600 m', time: '07:20', vo2: '57,2', hr: '186'},
-  {date: '2026-05-03', type: 'Cooper', distance: '2.950 m', time: '12:00', vo2: '55,0', hr: '184'}
+  {date: '2026-05-03', type: 'Outro', distance: '2000 m', time: '09:15', vo2: '55,0', hr: '184'}
 ];
 export function emptyStudent(count: number): Student {
   return {...students[0], id: crypto.randomUUID(), name:'', birth:'', email:'', street:'', number:'', neighborhood:'', city:'', state:'',

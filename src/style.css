@@ -7,3 +7,54 @@
 @media(min-width:1000px){.mobile-header,.bottom-nav{display:none}.sidebar{display:flex;flex-direction:column;position:fixed;inset:0 auto 0 0;width:225px;padding:33px 23px 24px;border-right:1px solid #293324;background:#141c13}.brand{display:flex;align-items:center;gap:10px;font-size:9px;font-weight:700;letter-spacing:.2px}.brand-symbol{font-size:30px}.brand small{display:block;font-size:7px;letter-spacing:3.8px;margin-top:5px;color:#a2b194;white-space:nowrap}.sidebar nav{margin-top:55px;display:flex;flex-direction:column;gap:9px}.sidebar nav button{justify-content:flex-start;min-height:48px;padding:0 16px;color:#9bad8e;font-size:13px;gap:14px}.sidebar nav button.active{background:#b8ed7111;color:var(--primary)}.sidebar-end{display:flex;align-items:center;gap:11px;margin-top:auto;color:#c6d3bc}.coach-avatar{width:34px;height:34px;border-radius:50%;background:#2e4224;color:#bdd7a7;font-size:10px;display:flex;align-items:center;justify-content:center}.sidebar-end strong{font-size:10px;font-weight:500}.sidebar-end small{display:block;font-size:9px;color:#809571;margin-top:5px}.workspace{margin-left:225px}.desktop-header{display:flex;align-items:center;justify-content:space-between;height:77px;padding:0 43px;border-bottom:1px solid #28322180;color:#afbea3;font-size:12px}.desktop-header>span:last-child{font-size:10px;color:#728968}main{padding:43px 45px 70px;max-width:850px;min-height:calc(100vh - 77px)}.home-page{max-width:620px;margin:auto}.greeting{margin-top:0;margin-bottom:28px}.greeting h1{font-size:37px}.greeting .eyebrow{font-size:10px}.active-count{margin-top:13px}.home-primary{max-width:100%;min-height:58px}.home-section{margin-top:33px}.home-section h2{font-size:17px}.action-row{padding:20px 0;min-height:82px}.row-group{padding:0 22px}.row-text strong{font-size:14px}.home-page .row-text small{font-size:12px}.home-page .row-group{background:#192217}.page-title{margin-top:0}.page-title h1{font-size:34px}.page-title>.primary{font-size:13px;padding:12px 18px;min-height:47px}.profile-intro h1{font-size:32px}.profile-primary{max-width:100%;min-height:54px}.profile-summary{margin-top:34px}.profile-summary h2{font-size:18px}.next-workout{padding:24px}.next-workout .row-text strong{font-size:21px}.detail-links .action-row{min-height:65px}.detail-links .row-text strong{font-size:14px}.wide-content{max-width:1200px;padding:40px 38px 70px}.workouts-heading h1{font-size:30px}.workouts-heading p{font-size:13px}.week-toolbar{justify-content:space-between;margin:0;padding-bottom:17px}.week-navigation{justify-content:flex-start;flex:0;gap:24px}.week-navigation strong{font-size:16px}.week-navigation strong small{display:inline;margin-left:9px;font-size:11px}.week-navigation>div>span{text-align:left;font-size:9px}.week-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:28px}.workout-card{padding:9px 17px 13px}.workout-card h3{font-size:17px}.workout-summary{font-size:13px}.workout-type{font-size:9px}.day-label h2{font-size:17px}.day-label{margin-bottom:16px}.add-workout{font-size:12px}.current-week{margin-left:69px}.toast{bottom:28px}.sheet{padding:30px}.sheet-actions>.primary{min-height:48px}.filter-panel{padding:20px}.data-list dt{font-size:13px}}
 @media(min-width:1000px) and (max-width:1170px){.wide-content{padding-left:30px;padding-right:30px}.week-grid{gap:14px}.workout-card{padding-left:13px;padding-right:13px}.workout-summary{font-size:12px}.workout-card h3{font-size:16px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+/* V3 refinements: same visual system, full mobile form surfaces. */
+.form-back{display:none}
+.sheet-header>div{min-width:0;flex:1}
+.sheet-header p{margin:8px 0 0;overflow-wrap:anywhere}
+.current-form-step{font-size:17px;margin:0 0 23px;color:#d2e0c7}
+.form-steps{margin-bottom:20px}
+.medical-field{border-left:2px solid #8b7f46;background:#9c8a3610;padding:14px;border-radius:0 9px 9px 0}
+.form-fields .medical-field{color:#c9be8e}
+.workout-preview p{margin-top:7px}
+.delete-context{color:#bdcbb1;line-height:1.8}
+.delete-context strong{color:#e1e9dc;font-weight:550}
+.danger-text,.danger-text .row-icon,.danger-text .chevron{color:#e3a38d}
+.danger-button{min-height:50px;padding:13px 20px;border-radius:11px;background:#a84531;color:#fff4ed;font-weight:550;font-size:14px}
+.sheet-actions>.secondary{min-height:50px}
+.sheet-header h2{overflow-wrap:anywhere}
+.workouts-heading>div,.profile-intro>div{min-width:0}
+.workouts-heading h1,.profile-intro h1,.workout-card h3{overflow-wrap:anywhere}
+.week-options,.workout-card .icon-button{width:44px;height:44px;min-height:44px}
+:focus-visible{scroll-margin:100px 0}
+@media(max-width:599px){
+  .overlay.form-overlay{display:block;position:fixed;inset:0;background:var(--bg);padding:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;backdrop-filter:none;align-items:unset}
+  .form-overlay .form-sheet{width:100%;max-width:none;min-height:100dvh;max-height:none;overflow:visible;border:0;border-radius:0;padding:0 22px calc(24px + env(safe-area-inset-bottom));box-shadow:none}
+  .form-sheet .sheet-header{position:sticky;top:0;z-index:2;align-items:center;background:#182016;padding:18px 0 17px;margin:0 0 22px;gap:10px;border-bottom:1px solid #304027}
+  .form-sheet .sheet-header .form-back{display:inline-flex;margin-left:-10px;flex-shrink:0}
+  .form-sheet .sheet-close{display:none}
+  .form-sheet .sheet-header h2{font-size:22px;line-height:1.3}
+  .form-sheet .sheet-header p{font-size:11px;line-height:1.5;margin:6px 0 0}
+  .form-sheet .sheet-actions{position:sticky;bottom:0;z-index:1;background:#182016;padding:16px 0 calc(16px + env(safe-area-inset-bottom));margin-bottom:calc(-24px - env(safe-area-inset-bottom));border-top:1px solid #304027}
+  .form-sheet .form-fields{grid-template-columns:minmax(0,1fr)}
+  .form-sheet .form-fields input,.form-sheet .form-fields select{min-height:54px}
+  .form-sheet .form-fields textarea{min-height:102px;resize:none}
+  .form-sheet .form-steps button{min-height:52px}
+  .form-sheet .form-note{margin-bottom:18px}
+  .form-sheet :is(input,select,textarea){scroll-margin-top:120px;scroll-margin-bottom:100px}
+  .form-sheet .sheet-actions .primary{min-height:52px}
+}
+@media(min-width:600px){
+  .sheet-header .sheet-close{margin-top:-7px}
+  .form-sheet .form-fields textarea{min-height:95px}
+}
+@media(min-width:1000px){
+  main.narrow-content{max-width:740px}
+  .narrow-content .plan-summary{max-width:530px}
+  .narrow-content .row-group,.narrow-content .race-list{max-width:600px}
+}
+@media(hover:hover){
+  .student-row:hover,.action-row:hover{background:#b9e77c08}
+  .icon-button:hover{background:#c2e7a111}
+  .back-button:hover,.text-button:hover{color:var(--primary)}
+}

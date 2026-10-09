@@ -12,16 +12,16 @@ const options: Partial<Record<keyof Student, string[]>> = {shirt:['PP','P','M','
 export default function StudentForm({initial, editing, initialStep = 0, onClose, onSave}: {initial: Student; editing: boolean; initialStep?: number; onClose: () => void; onSave: (s: Student) => void}) {
   const [student, setStudent] = useState(initial), [step, setStep] = useState(initialStep), [error, setError] = useState('');
   const form = useRef<HTMLFormElement>(null);
-  function move(next: number) {if (next > step && !form.current?.reportValidity()) return; setError(''); setStep(next); form.current?.closest('.sheet')?.scrollTo({top:0});}
+  function move(next: number) {if (next > step && !form.current?.reportValidity()) return; setError(''); setStep(next); form.current?.closest('.sheet')?.scrollTo({top:0}); form.current?.closest('.overlay')?.scrollTo({top:0});}
   function submit(e: FormEvent) {
     e.preventDefault();
     if (step < 2) {move(step + 1); return;}
     if (!student.name.trim() || !student.birth) {setStep(0);setError('Preencha nome e data de nascimento.');return;}
     onSave({...student, name:student.name.trim()});
   }
-  return <Modal title={editing ? 'Editar aluno' : 'Novo aluno'} subtitle={`Etapa ${step + 1} de 3`} onClose={onClose}>
+  return <Modal fullScreenOnMobile title={editing ? 'Editar aluno' : 'Novo aluno'} subtitle={`Etapa ${step + 1} de 3`} onClose={onClose}>
     <div className="form-steps" aria-label="Etapas do cadastro">{['Pessoal','Corrida','Plano e saúde'].map((label, i) => <button type="button" key={label} aria-current={step === i ? 'step' : undefined} className={step === i ? 'selected' : ''} onClick={() => move(i)}><span>{i + 1}</span>{label}</button>)}</div>
-    <form ref={form} onSubmit={submit}>{error && <p className="form-error" role="alert">{error}</p>}<div className="form-fields">{steps[step].map(([key, label]) => <label className={['name','medical','notes','availability'].includes(key) ? 'full' : ''} key={key}>{label}
+    <h3 className="current-form-step">{['Pessoal','Corrida','Plano e saúde'][step]}</h3><form ref={form} onSubmit={submit}>{error && <p className="form-error" role="alert">{error}</p>}<div className="form-fields">{steps[step].map(([key, label]) => <label className={`${['name','medical','notes','availability'].includes(key) ? 'full' : ''} ${key === 'medical' ? 'medical-field' : ''}`} key={key}>{label}
       {options[key] ? <select value={String(student[key])} onChange={e => setStudent({...student, [key]:e.target.value})}>{options[key]!.map(v => <option key={v}>{v}</option>)}</select>
       : ['medical','notes'].includes(key) ? <textarea value={String(student[key])} onChange={e => setStudent({...student, [key]:e.target.value})}/>
       : <input required={['name','birth'].includes(key)} type={['birth','raceDate'].includes(key) ? 'date' : ['value','due','frequency'].includes(key) ? 'number' : key === 'email' ? 'email' : 'text'} inputMode={['value','due','frequency'].includes(key) ? 'decimal' : undefined} min={key === 'value' ? 0 : 1} max={key === 'due' ? 31 : key === 'frequency' ? 7 : key === 'birth' ? '2026-10-08' : undefined} step={key === 'value' ? 0.01 : undefined} value={String(student[key])} onChange={e => setStudent({...student, [key]:['value','due','frequency'].includes(key) ? Number(e.target.value) : e.target.value})}/>}

@@ -1,6 +1,6 @@
-# Vanderlei Costa · Protótipo V2
+# Vanderlei Costa · Protótipo V3
 
-Uma exploração mais simples da V1: mobile-first, com a mesma identidade escura e verde. Frontend React + TypeScript + Vite, sem backend ou integrações.
+Refinamento final da direção aprovada na V2: mobile-first, com a mesma identidade escura e verde e os mesmos quatro destinos principais. Frontend React + TypeScript + Vite, sem backend ou integrações.
 
 ## Executar
 
@@ -17,18 +17,28 @@ Abra o endereço exibido pelo Vite. Para validar:
 npm run build
 ```
 
-## V1 preservada
+## Versões preservadas
 
-Antes da primeira alteração desta rodada, o projeto foi versionado em Git:
+Antes das alterações, as versões anteriores foram preservadas:
 
-- Commit da V1: `3c4505c` — `prototype-v1-complete-dashboard`
-- Tag: `prototype-v1-complete-dashboard`
-- Referência estável da V1: tag `prototype-v1-complete-dashboard`
-- Branch atual da V2: `v2` (a exploração começou como `prototype-v2-simple-mobile`)
+- **V1:** commit `3c4505c`, tag `prototype-v1-complete-dashboard`, arquivo `vanderlei-costa-v1-preservada.zip` em `outputs`.
+- **V2 aprovada:** commit `e58b30b`, tag `prototype-v2-approved`, arquivo `vanderlei-costa-v2-preservada.zip` em `outputs`.
+- **V3:** branch `prototype-v3-final-refinement`.
 
-A pasta `outputs` também contém `vanderlei-costa-v1-preservada.zip`, com o código e a compilação da V1. Para recuperar o código da V1 pelo Git, use a tag `prototype-v1-complete-dashboard`; a branch `main` já recebeu alterações posteriores. O ZIP da V2 não inclui o diretório `.git`; o histórico fica no projeto local.
+Use as tags para recuperar exatamente as versões aprovadas; branches podem receber alterações posteriores. Os ZIPs não incluem `.git`; o histórico fica no projeto local.
 
-Os dados da V1 no navegador (`vc-students-v1` e `vc-schedule-v1`) não foram alterados. A V2 usa chaves próprias: `vc-students-v2` e `vc-schedule-v2`. Dados de versões diferentes não são migrados nem misturados.
+A V3 usa `vc-students-v3` e `vc-schedule-v3`. Os dados locais das versões anteriores permanecem intactos. Cada versão começa com seus próprios exemplos; não há migração ou mistura de cadastros.
+
+## Refinamentos finais da V3
+
+- Formulários de aluno e treino ocupam a tela inteira no celular, com uma única superfície de rolagem, cabeçalho de retorno e ações no rodapé. Menus curtos permanecem compactos.
+- Ações de treino reunidas em componente próprio: editar, duplicar no mesmo dia e excluir com confirmação explícita.
+- Modelos abrem um editor independente; mudar a sessão não altera o modelo.
+- Prévia separa esforço, alvo, pausa, aquecimento e desaquecimento.
+- Duplicar semana informa que todas as sessões anteriores serão adicionadas e as existentes serão mantidas, inclusive nos dias já preenchidos.
+- Avaliações priorizam 2400 m, 1600 m e Outro; Cooper é apenas uma possibilidade secundária.
+- Telas administrativas com largura contida no desktop, sem novos dados ou métricas.
+- Mensagens distinguem cadastro criado/atualizado e treino salvo/atualizado/excluído/duplicado. Foco, Escape e áreas de toque revisados.
 
 ## Decisões de simplificação
 
@@ -50,7 +60,7 @@ Os dados da V1 no navegador (`vc-students-v1` e `vc-schedule-v1`) não foram alt
 - Data fixa: **08/10/2026, quinta-feira**. A Home mostra 4 atletas com treino, 1 aniversário e 3 vencimentos entre 8 e 15 de outubro.
 - Semanas de 28/09–04/10, 05–11/10 e 12–18/10/2026. Os índices da agenda correspondem aos dias reais: terça, quinta e domingo.
 - A semana seguinte contém dias vazios, para demonstrar a criação de treinos.
-- Avaliações ilustrativas de 1600 m, 2400 m e Cooper; a interface também informa a possibilidade de outro teste. Não há teste oficial assumido ou fórmula de VO₂.
+- Avaliações ilustrativas de 1600 m, 2400 m e Outro; Cooper é citado apenas como possibilidade secundária. Não há teste oficial assumido ou fórmula de VO₂.
 - Provas fictícias em 25/10 e 08/11, posteriores à data da demonstração.
 
 Edições persistem apenas no armazenamento do navegador, por origem. Não use dados reais. Não há sincronização, cobrança ou autenticação. Duplicar a semana anterior **adiciona** as sessões, sem substituir as existentes.
@@ -61,11 +71,15 @@ Edições persistem apenas no armazenamento do navegador, por origem. Não use d
 - `src/data.ts`: tipos, dados, modelos e datas de referência.
 - `src/StudentForm.tsx`: cadastro em três etapas.
 - `src/WorkoutEditor.tsx`: formulário dinâmico e prévia.
-- `src/Modal.tsx`: janela/painel móvel com Escape, retorno de foco e navegação por teclado.
+- `src/Modal.tsx`: superfície de formulário ou menu compacto, com Escape, retorno de foco e navegação por teclado.
+- `src/WorkoutActions.tsx`: menu de ações do treino.
+- `src/scheduleOperations.ts`: operações locais isoladas da navegação e dos modelos.
 - `src/style.css`: estilos mobile-first e variáveis de tema (`--primary`, `--secondary`, `--bg`, `--panel`, `--logo-text`). A marca tipográfica VC pode ser substituída sem alterar os fluxos.
 
 ## Verificação desta rodada
 
-Compilação TypeScript e Vite concluída. Conferidos no navegador: busca de alunos, perfil, edição do plano, editor de rodagem/tiros, mudança para intervalado por tempo, uso de modelo, duplicação de sessão e de semana. Layout conferido no desktop e no celular (375–390 px), incluindo cadastro em uma coluna. Dados e datas dos exemplos foram validados.
+Veja `QA-V3.md` para os fluxos, resultados e limites da conferência em 390 px e desktop. A compilação TypeScript/Vite e as verificações de integridade da agenda passaram.
 
-A configuração de publicação adicionada durante a revisão foi preservada. A build usa o caminho-base `/vanderlei-costa/`; não foi feita nova publicação nesta rodada.
+Veja `VALIDACAO-FUTURA.md` para as hipóteses apenas documentadas: copiar para outro destino, compartilhamento de treino e portal do aluno. Nenhuma delas foi implementada.
+
+A configuração de publicação existente foi preservada. A build usa o caminho-base `/vanderlei-costa/`; não foi feita nova publicação nesta rodada.
