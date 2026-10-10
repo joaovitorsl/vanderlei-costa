@@ -29,6 +29,8 @@ https://joaovitorsl.github.io/vanderlei-costa/
 
 - Treinos de hoje: separa alunos ativos com treino e sem treino planejado no dia; ambos abrem a semana do aluno para prescrição.
 
+- Treinos: seleção de mês, status por aluno ativo (Sem prescrição, Parcial e Mês planejado) e filtro Pendentes. Um mês exige ao menos uma sessão em cada terça, quinta e domingo, inclusive datas anteriores ao dia atual. O clique abre a primeira semana incompleta; ao voltar, mês e filtro são preservados. O status é derivado das prescrições, sem novos dados persistidos.
+
 ## Modelo de dados e migração
 
 - `Student.runningSince`: ano estável, substitui `experience`. Durações legadas em anos/meses são convertidas uma vez usando a data fixa da demonstração; textos não interpretáveis deixam o ano sem informação.
@@ -60,3 +62,5 @@ Abra `?resetDemo=1` na URL. Somente as chaves locais desta demonstração (aluno
 ## Decisões posteriores com o cliente
 
 Confirmar a convenção definitiva da matrícula (o protótipo usa ano + sequência), o calendário real e os dados de exemplo. A relação entre prescrição e encontro, regras comerciais/Plano Família, cobranças, uniformes, musculação, integrações, área do atleta, WhatsApp e disponibilidade avançada seguem fora desta rodada.
+
+Validação do planejamento mensal: testes para viradas de mês/ano, fevereiro bissexto, sessões duplicadas e isolamento por aluno/mês. Conferido em desktop e mobile: mês vazio, preenchimento até concluir, filtro Pendentes, retorno a Parcial após excluir treino e preservação do mês selecionado.

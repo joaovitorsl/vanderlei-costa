@@ -46,6 +46,6 @@ export function scenario(tab,browser,width,outputDir) {
    await area('Próximas provas');await p.getByText('Prova QA',{exact:true}).click();await event.getByRole('button',{name:'Excluir prova',exact:true}).click();await p.getByRole('dialog').getByRole('button',{name:'Excluir prova',exact:true}).click();await absent('Prova QA');
    return {width,races:'passed'};
   },
-  async finish(){await nav('Treinos');await b(/Rafael Oliveira/).click();await has('Tiros 200 m');await shot('treinos-preservados');const errors=await tab.dev.logs({levels:['error'],limit:100});assert.equal(errors.length,0,JSON.stringify(errors));return {width,consoleErrors:0};}
+  async finish(){await nav('Treinos');await b(/Rafael Oliveira/).click();if(await b('Voltar para esta semana').isVisible())await b('Voltar para esta semana').click();await has('Tiros 200 m');await shot('treinos-preservados');const errors=await tab.dev.logs({levels:['error'],limit:100});assert.equal(errors.length,0,JSON.stringify(errors));return {width,consoleErrors:0};}
  };
 }

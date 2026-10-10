@@ -122,3 +122,13 @@ input[readonly]{color:var(--muted);background:#192117;cursor:default}
 
 .sidebar-end .sidebar-logout{margin-left:auto;width:32px;color:#809571}
 @media(min-width:1000px){.sidebar{overflow-y:auto}.sidebar-end{padding-top:20px}}
+
+.month-toolbar .week-navigation{display:flex;justify-content:space-between;gap:12px;width:100%}
+.month-name{font-size:16px!important;text-transform:capitalize}
+.planning-note{font-size:12px;margin:10px 0 20px}
+.planning-filters{display:flex;gap:8px;margin-top:14px}
+.planning-filters button{font-size:12px;padding:0 15px;border:1px solid #34422c;min-height:40px;color:var(--muted)}
+.planning-filters button[aria-pressed=true]{background:#26371e;color:var(--primary);border-color:#4c643b}
+.planning-status{display:inline-block;font-size:11px;border-radius:6px;padding:4px 7px;background:#263024;color:#b5c4aa;white-space:nowrap}
+.planning-partial{background:#393422;color:#dbca96}
+.planning-complete{background:#283b1e;color:var(--primary)}
