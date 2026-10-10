@@ -3,22 +3,23 @@ import assert from 'node:assert/strict';
 import {students, templates, initialSchedule, normalizeStudent} from '../src/data.ts';
 import {initialRaces, initialAgenda, normalizeSchedule, migrateRaces, nextRaceFor, futureRaces, entriesForWeek, agendaConflict, entryWeek, type Race, type AgendaEntry} from '../src/collectiveData.ts';
 import {demoKeys, loadDemo, resetDemo} from '../src/demoStorage.ts';
-const legacy=students.map(p=>{const r=initialRaces.find(r=>r.participantIds.includes(p.id));return {...p,race:r?.name||'',raceDate:r?.date||'',raceDistance:r?.distance||''};});
+const oldRaces=[{name:'Circuito Parque Verde',date:'2026-10-25',distance:'10 km',participantIds:['1','3','5','7','9','11']},{name:'Meia da Primavera',date:'2026-11-08',distance:'21 km',participantIds:['2','4','6','8']}];
+const legacy=students.map(p=>{const r=oldRaces.find(r=>r.participantIds.includes(p.id));return {...p,race:r?.name||'',raceDate:r?.date||'',raceDistance:r?.distance||''};});
 const storage=(entries:Record<string,unknown>)=>({getItem:(key:string)=>key in entries?JSON.stringify(entries[key]):null});
 test('race mocks keep all original participants, including Rafael at Primavera',()=>{
   const migrated=migrateRaces(legacy);
   assert.equal(migrated.length,2);
-  for(const seed of initialRaces){const event=migrated.find(r=>r.name===seed.name)!;assert.deepEqual(event.participantIds,seed.participantIds);assert.equal(event.distance,seed.distance);assert.equal(event.date,seed.date);}
+  for(const seed of oldRaces){const event=migrated.find(r=>r.name===seed.name)!;assert.deepEqual(event.participants.map(p=>p.studentId),seed.participantIds);assert.deepEqual(event.distances,[seed.distance]);assert.equal(event.date,seed.date);}
   assert.equal(nextRaceFor(migrated,'2')?.name,'Meia da Primavera');
   assert.equal(nextRaceFor(migrated,'10'),undefined);
 });
 test('profile always derives the nearest future linked event after edits, removals and deletion',()=>{
-  const nearer:Race={id:'new',name:'Nova prova',date:'2026-10-10',distance:'5 km',location:'',participantIds:['2']};
+  const nearer:Race={id:'new',name:'Nova prova',date:'2026-10-10',distances:['5 km'],location:'',participants:[{studentId:'2',distance:'5 km'}]};
   const past={...nearer,id:'past',date:'2026-10-07'};
   assert.equal(nextRaceFor([...initialRaces,nearer,past],'2')?.id,'new');
-  assert.equal(nextRaceFor([...initialRaces,{...nearer,date:'2026-12-01'}],'2')?.name,'Meia da Primavera');
-  assert.equal(nextRaceFor([...initialRaces,{...nearer,participantIds:[]}],'2')?.name,'Meia da Primavera');
-  assert.equal(nextRaceFor(initialRaces.filter(r=>r.id!=='race-primavera'),'2'),undefined);
+  assert.equal(nextRaceFor([...initialRaces,{...nearer,date:'2026-12-01'}],'2')?.name,'Circuito Parque Verde');
+  assert.equal(nextRaceFor([...initialRaces,{...nearer,participants:[]}],'2')?.name,'Circuito Parque Verde');
+  assert.equal(nextRaceFor(initialRaces.filter(r=>r.id!=='race-parque'),'2')?.name,'Meia da Primavera');
   assert.ok(!futureRaces([past]).length);
 });
 test('migration reads events before stripping old student fields and preserves custom data',()=>{
@@ -27,7 +28,7 @@ test('migration reads events before stripping old student fields and preserves c
   const loaded=loadDemo(storage({[demoKeys.students]:prior}));
   assert.equal(loaded.races.length,3);
   assert.equal(loaded.people[0].notes,'Anotação personalizada');
-  assert.equal(loaded.races.find(r=>r.name==='Prova personalizada')?.participantIds[0],'1');
+  assert.equal(loaded.races.find(r=>r.name==='Prova personalizada')?.participants[0].studentId,'1');
   for(const p of loaded.people){assert.ok(!('race' in p));assert.ok(!('raceDate' in p));assert.ok(!('raceDistance' in p));}
   assert.deepEqual(normalizeStudent(loaded.people[0]),loaded.people[0]);
   const reloaded=loadDemo(storage({[demoKeys.students]:loaded.people,[demoKeys.races]:loaded.races}));
@@ -55,7 +56,7 @@ test('free Sunday is a manual collective record; only the exact old example is r
   const legacy={...seed,title:'Treino livre',notes:'Faça no horário e local de sua preferência.',titleCustomized:true};
   assert.equal(normalizeSchedule({'1:1:6':[legacy]})['1:1:6'][0].title,'Rodagem longa');
   assert.equal(normalizeSchedule({'1:1:6':[{...legacy,notes:'Orientação editada'}]})['1:1:6'][0].title,'Treino livre');
-  assert.deepEqual(entriesForWeek(initialAgenda,1),[{id:'free-sunday-example',kind:'free-sunday',date:'2026-10-18'}]);
+  assert.deepEqual(entriesForWeek(initialAgenda,1),[{id:'free-sunday-example',kind:'free-day',date:'2026-10-18'}]);
   assert.deepEqual(entriesForWeek(initialAgenda,5),[]);
 });
 test('collective week is scoped, sorted by date/time and independent from prescriptions',()=>{
@@ -65,10 +66,10 @@ test('collective week is scoped, sorted by date/time and independent from prescr
   assert.equal(entryWeek('2026-10-11'),0);assert.equal(entryWeek('2026-10-12'),1);assert.equal(entryWeek('2026-10-04'),-1);
   assert.equal(entriesForWeek([],0).length,0);assert.deepEqual(initialSchedule,before);
 });
-test('free Sunday cannot coexist with a meeting or occur on a weekday',()=>{
-  const free:AgendaEntry={id:'test',kind:'free-sunday',date:'2026-10-11'};
+test('free day cannot coexist with a meeting and may occur on a weekday',()=>{
+  const free:AgendaEntry={id:'test',kind:'free-day',date:'2026-10-11'};
   assert.match(agendaConflict(free,initialAgenda),/já tem/);
-  assert.match(agendaConflict({...free,date:'2026-10-08'},[]),/domingo/);
+  assert.equal(agendaConflict({...free,date:'2026-10-08'},[]),'');
   assert.equal(agendaConflict({...free,date:'2026-10-25'},initialAgenda),'');
   assert.equal(agendaConflict(initialAgenda[5],initialAgenda),'');
   assert.match(agendaConflict({...initialAgenda[0],id:'new',date:'2026-10-18'},initialAgenda),/já tem/);

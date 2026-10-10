@@ -11,7 +11,7 @@ export type Student = {
   modality: string; plan: PlanName; renewalDate: string;
   uniformStatus?: 'Não se aplica' | 'Pendente' | 'Entregue';
   value: number; due: number; status: string; level: string;
-  goal: string; pace: string; frequency: number; experience: string;
+  goal: string; customGoal: string; pace: string; frequency: number; runningSince: string;
   availability: string;
   medical: string; notes: string;
 };
@@ -44,8 +44,8 @@ export const students: Student[] = names.map((name, i) => ({
   modality:'Corrida de rua', plan: (['Lite','Fire','Família'] as const)[i % 3], value:[80,420,150][i % 3],
   renewalDate:`2026-10-${String([10,10,12,20,20,25,25,20,25,20,25,25][i]).padStart(2,'0')}`,
   due: [10,10,12,20,20,25,25,20,25,20,25,25][i], status: i === 11 ? 'Pausado' : 'Ativo',
-  level: ['Intermediário','Avançado','Iniciante'][i % 3], goal: ['10 km','21 km','5 km'][i % 3],
-  pace: ['5:45','4:50','6:30'][i % 3], frequency: 3, experience: ['2 anos','4 anos','6 meses'][i % 3],
+  level: ['Intermediário','Avançado','Iniciante'][i % 3], goal: ['10 km','21 km','5 km'][i % 3], customGoal:'',
+  pace: ['5:45','4:50','6:30'][i % 3], frequency: 3, runningSince: ['2024','2022','2026'][i % 3],
   availability: 'Domingo, terça e quinta · manhã',
   medical: i === 0 ? 'Histórico de desconforto no joelho direito. Observar relato de dor.' : '',
   notes: 'Prefere treinar pela manhã.'
@@ -80,8 +80,11 @@ export const dueDayThisMonth = (student: Pick<Student, 'plan' | 'due' | 'renewal
 export function normalizeStudent(student: Student): Student {
   const knownPlan = Object.hasOwn(commercialPlans, student.plan);
   const plan = knownPlan ? student.plan : students.find(seed => seed.id === student.id)?.plan || 'Lite';
-  const {race, raceDate, raceDistance, ...profile} = student as Student & {race?:string;raceDate?:string;raceDistance?:string};
-  return {...profile, modality:student.modality || 'Corrida de rua', plan,
+  const {race, raceDate, raceDistance, experience, ...profile} = student as Student & {race?:string;raceDate?:string;raceDistance?:string;experience?:string};
+  const years = experience?.match(/^(\d+)\s*anos?$/);
+  const runningSince = student.runningSince ?? (years ? String(today.getFullYear()-Number(years[1])) : experience?.match(/^(\d+)\s*mes/) ? String(new Date(today.getFullYear(),today.getMonth()-Number(experience.match(/^(\d+)/)![1]),today.getDate()).getFullYear()) : '');
+  const predefined = ['3 km','5 km','10 km','21 km','42 km','Outro'].includes(student.goal);
+  return {...profile, runningSince, goal:predefined?student.goal:'Outro', customGoal:student.customGoal ?? (predefined?'':student.goal), modality:student.modality || 'Corrida de rua', plan,
     value:knownPlan ? student.value : commercialPlans[plan].value,
     renewalDate:student.renewalDate ?? (student.due ? `2026-10-${String(student.due).padStart(2,'0')}` : '')};
 }
@@ -94,8 +97,22 @@ export const assessments = [
   {date: '2026-07-10', type: '1600 m', distance: '1600 m', time: '07:20', vo2: '57,2', hr: '186'},
   {date: '2026-05-03', type: 'Outro', distance: '2000 m', time: '09:15', vo2: '55,0', hr: '184'}
 ];
-export function emptyStudent(count: number): Student {
+export function emptyStudent(): Student {
   return {...students[0], id: crypto.randomUUID(), name:'', birth:'', email:'', street:'', number:'', neighborhood:'', city:'', state:'',
-    enrollment:`2026-${String(count + 1).padStart(3, '0')}`, modality:'Corrida de rua', plan:'Lite', value:80, renewalDate:'', due:10, status:'Ativo',
+    enrollment:'', customGoal:'', runningSince:'', modality:'Corrida de rua', plan:'Lite', value:80, renewalDate:'', due:10, status:'Ativo',
     medical:'', notes:''};
+}
+
+export const goalLabel = (student: Pick<Student,'goal'|'customGoal'>) => student.goal === 'Outro' ? student.customGoal || 'Outro' : student.goal;
+export function nextEnrollment(people: Student[], year=today.getFullYear()): string {
+  const used=new Set(people.map(p=>p.enrollment));
+  const highest=Math.max(0,...people.map(p=>p.enrollment.match(new RegExp(`^${year}-(\\d+)$`))).map(m=>m?Number(m[1]):0));
+  let sequence=highest+1;
+  while(used.has(`${year}-${String(sequence).padStart(3,'0')}`)) sequence++;
+  return `${year}-${String(sequence).padStart(3,'0')}`;
+}
+export function saveStudent(people:Student[], draft:Student):Student[] {
+  const existing=people.find(p=>p.id===draft.id);
+  const saved={...draft,enrollment:existing?existing.enrollment:nextEnrollment(people)};
+  return existing?people.map(p=>p.id===draft.id?saved:p):[...people,saved];
 }
