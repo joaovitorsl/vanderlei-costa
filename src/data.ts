@@ -1,5 +1,5 @@
 export const commercialPlans = {
-  Lite: {value:80, months:1, benefits:['Treinos às terças, quintas e domingos.', 'Um domingo livre por mês, no horário e local de sua preferência.']},
+  Lite: {value:80, months:1, benefits:['Treinos às terças, quintas e domingos.']},
   Fire: {value:420, months:6, benefits:['Pagamento via PIX.', 'Uniforme incluso.']},
   Família: {value:150, months:1, benefits:['Para mais de uma pessoa da mesma família.', 'Avaliação física com peso, medidas e bioimpedância inclusa.']}
 } as const;
@@ -12,13 +12,12 @@ export type Student = {
   uniformStatus?: 'Não se aplica' | 'Pendente' | 'Entregue';
   value: number; due: number; status: string; level: string;
   goal: string; pace: string; frequency: number; experience: string;
-  availability: string; race: string; raceDate: string; raceDistance: string;
+  availability: string;
   medical: string; notes: string;
 };
 export type Workout = {
   duplicatedFromWeek?: number;
   titleCustomized?: boolean;
-  location?: string;
   id: string; type: string; title: string; warmup: number; reps: number;
   distance: number; target: string; rest: number; cooldown: number;
   pace: string; duration: number; notes: string;
@@ -48,9 +47,6 @@ export const students: Student[] = names.map((name, i) => ({
   level: ['Intermediário','Avançado','Iniciante'][i % 3], goal: ['10 km','21 km','5 km'][i % 3],
   pace: ['5:45','4:50','6:30'][i % 3], frequency: 3, experience: ['2 anos','4 anos','6 meses'][i % 3],
   availability: 'Domingo, terça e quinta · manhã',
-  race: i === 9 || i === 11 ? '' : i % 2 ? 'Meia da Primavera' : 'Circuito Parque Verde',
-  raceDate: i === 9 || i === 11 ? '' : i % 2 ? '2026-11-08' : '2026-10-25',
-  raceDistance: i === 9 || i === 11 ? '' : i % 2 ? '21 km' : '10 km',
   medical: i === 0 ? 'Histórico de desconforto no joelho direito. Observar relato de dor.' : '',
   notes: 'Prefere treinar pela manhã.'
 }));
@@ -73,10 +69,6 @@ for (const student of students.filter(s => s.modality === 'Corrida de rua' && s.
     }
   }
 }
-// Illustrative locations and one manually planned free Sunday; no monthly automation.
-initialSchedule['2:0:1'][0].location = 'Açude Velho';
-initialSchedule['2:0:3'][0].location = 'Plínio Lemos';
-initialSchedule['1:1:6'][0] = {...initialSchedule['1:1:6'][0], title:'Treino livre', titleCustomized:true, notes:'Faça no horário e local de sua preferência.'};
 export const planPrice = (student: Pick<Student, 'plan' | 'value'>) => `${money(student.value)} / ${commercialPlans[student.plan].months === 6 ? '6 meses' : 'mês'}`;
 export const renewalLabel = (student: Pick<Student, 'plan' | 'due' | 'renewalDate'>) => student.plan === 'Fire'
   ? (student.renewalDate && Number.isFinite(new Date(student.renewalDate+'T12:00:00').getTime()) ? shortDate(new Date(student.renewalDate+'T12:00:00')) : 'Não informada')
@@ -88,7 +80,8 @@ export const dueDayThisMonth = (student: Pick<Student, 'plan' | 'due' | 'renewal
 export function normalizeStudent(student: Student): Student {
   const knownPlan = Object.hasOwn(commercialPlans, student.plan);
   const plan = knownPlan ? student.plan : students.find(seed => seed.id === student.id)?.plan || 'Lite';
-  return {...student, modality:student.modality || 'Corrida de rua', plan,
+  const {race, raceDate, raceDistance, ...profile} = student as Student & {race?:string;raceDate?:string;raceDistance?:string};
+  return {...profile, modality:student.modality || 'Corrida de rua', plan,
     value:knownPlan ? student.value : commercialPlans[plan].value,
     renewalDate:student.renewalDate ?? (student.due ? `2026-10-${String(student.due).padStart(2,'0')}` : '')};
 }
@@ -104,5 +97,5 @@ export const assessments = [
 export function emptyStudent(count: number): Student {
   return {...students[0], id: crypto.randomUUID(), name:'', birth:'', email:'', street:'', number:'', neighborhood:'', city:'', state:'',
     enrollment:`2026-${String(count + 1).padStart(3, '0')}`, modality:'Corrida de rua', plan:'Lite', value:80, renewalDate:'', due:10, status:'Ativo',
-    race:'', raceDate:'', raceDistance:'', medical:'', notes:''};
+    medical:'', notes:''};
 }

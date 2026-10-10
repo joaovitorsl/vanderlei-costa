@@ -82,4 +82,28 @@
 .sheet-header h2,.sheet-header p,.sheet-actions button,.data-list dd,.plan-summary h2{overflow-wrap:anywhere;min-width:0}
 @media(max-width:599px){.app:has(~ .form-overlay) .bottom-nav{visibility:hidden}}
 
-.plan-benefits{margin:18px 0}.plan-benefits p+p{margin-top:6px}.workout-location{font-size:13px;margin-top:6px;overflow-wrap:anywhere}
+.plan-benefits{margin:18px 0}.plan-benefits p+p{margin-top:6px}
+
+/* Collective records reuse the existing rows, sheets and week navigation. */
+.home-page .row-text small{white-space:pre-line}
+.agenda-add{margin:18px 0 20px;min-height:44px}
+.agenda-days{display:flex;flex-direction:column;gap:25px}
+.agenda-day h2{text-transform:capitalize;font-size:17px;margin-bottom:12px}
+.agenda-entry{padding:18px 0;display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:16px;row-gap:8px}
+.agenda-entry+.agenda-entry{border-top:1px solid #2b352670}
+.agenda-entry time{font-size:14px;color:var(--primary);padding-top:2px}
+.agenda-entry>.row-text:only-of-type{min-width:0}
+.agenda-entry:not(:has(time))>.row-text{grid-column:1/-1}
+.agenda-entry .row-text>span{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+.event-actions{display:flex;gap:20px;justify-content:flex-end;grid-column:1/-1}
+.event-actions button{min-height:44px}
+.race-actions{padding:0 20px 10px}
+.participants{border:0;padding:0;margin:8px 0 0;min-width:0}
+.participants legend{font-size:13px;color:#b5c4aa}
+.participants .form-note{margin:10px 0}
+.participant-options{max-height:260px;overflow-y:auto;border:1px solid #34422c;border-radius:12px;padding:0 12px}
+.participant-options label{display:flex;flex-direction:row;align-items:center;gap:12px;min-height:54px;padding:9px 0;cursor:pointer}
+.participant-options label+label{border-top:1px solid #2b352670}
+.participant-options input[type=checkbox]{width:20px;height:20px;min-height:20px;flex-shrink:0;accent-color:var(--primary)}
+.participant-options span{font-size:13px;overflow-wrap:anywhere}
+.participant-options small{display:block;color:var(--muted);font-size:10px;margin-top:3px}

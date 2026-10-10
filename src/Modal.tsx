@@ -1,4 +1,5 @@
 import {useEffect, useLayoutEffect, useId, useRef, type ReactNode} from 'react';
+import {createPortal} from 'react-dom';
 import {ArrowLeft, X} from 'lucide-react';
 
 type Props = {
@@ -88,7 +89,7 @@ export default function Modal({title, subtitle, onClose, children, compact = fal
     };
   }, [fullScreenOnMobile]);
 
-  return <div ref={overlay} className={`overlay ${fullScreenOnMobile ? 'form-overlay' : ''}`} onClick={onClose}>
+  return createPortal(<div ref={overlay} className={`overlay ${fullScreenOnMobile ? 'form-overlay' : ''}`} onClick={onClose}>
     <section ref={ref} className={`sheet ${compact ? 'compact-sheet' : ''} ${stickyFooter ? 'sticky-footer-sheet' : ''} ${fullScreenOnMobile ? 'form-sheet' : ''}`} role="dialog" aria-modal="true" aria-labelledby={id} onClick={e => e.stopPropagation()}>
       <div className="sheet-header">
         {fullScreenOnMobile && <button type="button" className="icon-button form-back" onClick={onClose} aria-label="Voltar sem salvar"><ArrowLeft size={22}/></button>}
@@ -97,5 +98,5 @@ export default function Modal({title, subtitle, onClose, children, compact = fal
       </div>
       {children}
     </section>
-  </div>;
+  </div>, document.body);
 }

@@ -33,8 +33,8 @@ export async function runBusinessChecks(tab, browser, baseUrl, outputDir) {
     await b(width<1000 ? 'Voltar sem salvar' : 'Fechar').click();
     await nav('Treinos'); await b(/Rafael Oliveira/).click(); await p.domSnapshot(); await layout();
     await b('Editar treino').first().click();
-    assert.equal(await value('location'),'Açude Velho');
-    await p.domSnapshot(); await layout(); await shot(`${width}-editar-treino-local`);
+    assert.equal(await p.locator('input[name="location"]').count(),0);
+    await p.domSnapshot(); await layout(); await shot(`${width}-editar-treino`);
     await b('Cancelar').click(); await b('Ver perfil').click(); await b(/^Plano Fire/).click();
   }
   await viewport.set({width:390,height:844});
@@ -61,17 +61,16 @@ export async function runBusinessChecks(tab, browser, baseUrl, outputDir) {
   await b('Continuar').click(); await b('Continuar').click(); await b('Salvar aluno').click();
   await nav('Treinos'); await b(/Rafael Oliveira/).click();
   await b('Adicionar treino').first().click(); await b(/Usar modelo/).click(); await b(/^Tiros 200 m 6/).click();
-  await p.locator('input[name="location"]').fill('Parque de exemplo');
   for (const type of ['Intervalado por tempo','Rodagem','Tiros']) {
-    await select('Tipo de treino',type); assert.equal(await value('location'),'Parque de exemplo');
+    await select('Tipo de treino',type); assert.equal(await p.locator('input[name="location"]').count(),0);
   }
-  await p.getByLabel('Nome',{exact:true}).fill('Treino QA Local'); await b('Salvar treino').click();
-  assert.equal(await p.getByRole('article').filter({hasText:'Treino QA Local'}).getByText('📍 Parque de exemplo',{exact:true}).count(),1);
+  await p.getByLabel('Nome',{exact:true}).fill('Treino QA Estrutura'); await b('Salvar treino').click();
+  assert.equal(await p.getByRole('article').filter({hasText:'Treino QA Estrutura'}).getByText(/📍/).count(),0);
   await tab.reload(); await nav('Treinos'); await b(/Rafael Oliveira/).click();
-  await p.getByRole('article').filter({hasText:'Treino QA Local'}).getByRole('button',{name:'Editar treino'}).click();
-  assert.equal(await value('location'),'Parque de exemplo');
-  await p.locator('input[name="location"]').fill(''); await b('Salvar treino').click();
-  assert.equal(await p.getByRole('article').filter({hasText:'Treino QA Local'}).getByText(/📍/).count(),0);
+  await p.getByRole('article').filter({hasText:'Treino QA Estrutura'}).getByRole('button',{name:'Editar treino'}).click();
+  assert.equal(await p.locator('input[name="location"]').count(),0);
+  await b('Salvar treino').click();
+  assert.equal(await p.getByRole('article').filter({hasText:'Treino QA Estrutura'}).getByText(/📍/).count(),0);
   await b('Adicionar treino').first().click(); await b(/Criar treino Preencher/).click();
   await p.getByLabel('Nome',{exact:true}).fill('Treino QA sem local'); await b('Salvar treino').click();
   assert.equal(await p.getByRole('article').filter({hasText:'Treino QA sem local'}).count(),1);
@@ -81,5 +80,5 @@ export async function runBusinessChecks(tab, browser, baseUrl, outputDir) {
   assert.equal(await p.getByText('10 out',{exact:true}).count(),1);
   assert.equal((await tab.dev.logs({levels:['error'],limit:100})).length,0);
   await viewport.reset();
-  return {viewports:[360,390,430,1280,1440,1920],flows:['cadastro','edição','planos','perfil','criação e edição de treino','modelo','troca de tipo','local opcional','persistência','reset'],consoleErrors:0};
+  return {viewports:[360,390,430,1280,1440,1920],flows:['cadastro','edição','planos','perfil','criação e edição de treino','modelo','troca de tipo','prescrição sem local','persistência','reset'],consoleErrors:0};
 }
