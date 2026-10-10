@@ -27,6 +27,8 @@ https://joaovitorsl.github.io/vanderlei-costa/
 - Provas: uma prova tem várias distâncias (informadas por vírgula), e cada participante escolhe uma delas. Ao remover uma distância, é necessário corrigir os participantes afetados antes de salvar. O perfil deriva a próxima prova e a distância daquele atleta.
 - Nenhum dashboard, métrica, pagamento, integração, área do atleta ou novo módulo foi acrescentado.
 
+- Treinos de hoje: separa alunos ativos com treino e sem treino planejado no dia; ambos abrem a semana do aluno para prescrição.
+
 ## Modelo de dados e migração
 
 - `Student.runningSince`: ano estável, substitui `experience`. Durações legadas em anos/meses são convertidas uma vez usando a data fixa da demonstração; textos não interpretáveis deixam o ano sem informação.
