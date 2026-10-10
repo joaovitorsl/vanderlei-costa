@@ -51,3 +51,29 @@ test('reset removes only demo keys and its URL parameter, including blocked stor
 test('missing and invalid dates have a neutral label',()=>{
  assert.equal(dateLabel(''),'Não informada');assert.equal(dateLabel('broken'),'Não informada');
 });
+
+
+test('automatic workout names follow each new type', () => {
+  const tiros = changeWorkoutType(templates[0], 'Tiros');
+  assert.equal(tiros.title, 'Tiros');
+  const interval = changeWorkoutType(tiros, 'Intervalado por tempo');
+  assert.equal(interval.title, 'Intervalado por tempo');
+  assert.equal(changeWorkoutType(interval, 'Rodagem').title, 'Rodagem');
+});
+test('manual titles remain customized even when they match a default name', () => {
+  for (const title of ['Regenerativo pós-prova', 'Rodagem leve', '']) {
+    const custom = {...templates[0], title, titleCustomized:true};
+    assert.equal(changeWorkoutType(custom, 'Tiros').title, title);
+    assert.equal(changeWorkoutType(JSON.parse(JSON.stringify(custom)), 'Intervalado por tempo').title, title);
+  }
+  assert.equal(changeWorkoutType({...templates[0], title:'Nome personalizado da V5'}, 'Tiros').title, 'Nome personalizado da V5');
+});
+test('model title survives field edits and follows type only until manually renamed', () => {
+  const draft = {...cleanWorkout(templates[2]), reps:12};
+  assert.equal(draft.title, 'Tiros 200 m');
+  assert.equal(changeWorkoutType(draft, draft.type).title, 'Tiros 200 m');
+  assert.equal(changeWorkoutType(draft, 'Intervalado por tempo').title, 'Intervalado por tempo');
+  const custom = {...draft, title:'Série de quarta-feira', titleCustomized:true};
+  assert.equal(changeWorkoutType(custom, 'Rodagem').title, 'Série de quarta-feira');
+  assert.equal(templates[2].title, 'Tiros 200 m');
+});

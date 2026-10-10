@@ -9,6 +9,7 @@ export type Student = {
 };
 export type Workout = {
   duplicatedFromWeek?: number;
+  titleCustomized?: boolean;
   id: string; type: string; title: string; warmup: number; reps: number;
   distance: number; target: string; rest: number; cooldown: number;
   pace: string; duration: number; notes: string;

@@ -17,7 +17,7 @@ export default function WorkoutEditor({initial, subtitle, editing, onClose, onSa
   const [errors, setErrors] = useState<Record<string, string>>({});
   const change = (input: HTMLInputElement | HTMLTextAreaElement) => {
     const {name, value, type} = input;
-    setWorkout(current => ({...current, [name]:type === 'number' && value !== '' ? Number(value) : value}));
+    setWorkout(current => ({...current, [name]:type === 'number' && value !== '' ? Number(value) : value, ...(name === 'title' ? {titleCustomized:true} : {})}));
     if (errors[name]) setErrors(current => ({...current, [name]:fieldError(input)}));
   };
   const error = (key: string) => errors[key] && <span id={`workout-${key}-error`} className="field-error" role="alert">{errors[key]}</span>;

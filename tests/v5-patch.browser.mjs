@@ -1,0 +1,67 @@
+import assert from 'node:assert/strict';
+
+// Run with a CUA browser tab pointed at the built preview; no browser dependency needed.
+// await runV5PatchChecks(tab, 'http://127.0.0.1:5182/vanderlei-costa/');
+export async function runV5PatchChecks(tab, baseUrl) {
+  await tab.goto(`${baseUrl}?resetDemo=1`);
+  const p = tab.playwright;
+  const button = name => p.getByRole('button', {name, exact:typeof name === 'string'});
+  const title = () => p.getByLabel('Nome', {exact:true}).evaluate(el => el.value);
+  const choose = async type => {
+    await p.getByRole('combobox', {name:'Tipo de treino', exact:true}).selectOption(type);
+    await p.domSnapshot();
+  };
+  await button('Planejar treinos').click();
+  await button(/Rafael Oliveira/).click();
+  await p.domSnapshot();
+  await button('Opções da semana').click();
+  await button(/Duplicar semana anterior/).click();
+  const started = Date.now();
+  assert.equal(await p.getByRole('status').count(), 1, 'normal toast appears');
+  await button('Opções da semana').click();
+  assert.equal(await p.getByRole('dialog', {name:'Opções da semana', exact:true}).count(), 1);
+  assert.equal(await p.getByRole('status').count(), 0, 'opening sheet dismisses toast');
+  assert.ok(Date.now() - started < 3200, 'dismissal checked before toast timeout');
+  await button(/Duplicar semana anterior/).click();
+  assert.equal(await p.getByRole('dialog', {name:'Duplicar novamente?', exact:true}).count(), 1);
+  assert.equal(await p.getByRole('status').count(), 0);
+  await button('Cancelar').click();
+  await button('Adicionar treino').first().click();
+  await button(/Criar treino Preencher/).click();
+  assert.equal(await title(), 'Rodagem leve');
+  await choose('Tiros');
+  assert.equal(await title(), 'Tiros');
+  await choose('Intervalado por tempo');
+  assert.equal(await title(), 'Intervalado por tempo');
+  await choose('Rodagem');
+  assert.equal(await title(), 'Rodagem');
+  await p.getByLabel('Nome', {exact:true}).fill('Regenerativo pós-prova');
+  await choose('Tiros');
+  assert.equal(await title(), 'Regenerativo pós-prova');
+  await choose('Rodagem');
+  await button('Salvar treino').click();
+  assert.equal(await p.getByRole('status').count(), 1);
+  await p.getByRole('article').filter({hasText:'Regenerativo pós-prova'}).getByRole('button', {name:'Editar treino'}).click();
+  assert.equal(await p.getByRole('status').count(), 0, 'editor dismisses toast');
+  await choose('Intervalado por tempo');
+  assert.equal(await title(), 'Regenerativo pós-prova', 'customization survives saving and reopening');
+  await button('Cancelar').click();
+  await button('Adicionar treino').first().click();
+  await button(/Usar modelo/).click();
+  await button(/^Tiros 200 m 6/).click();
+  assert.equal(await title(), 'Tiros 200 m');
+  await p.getByLabel('Repetições', {exact:true}).fill('12');
+  assert.equal(await title(), 'Tiros 200 m', 'field changes preserve model title');
+  await choose('Intervalado por tempo');
+  assert.equal(await title(), 'Intervalado por tempo');
+  await p.getByLabel('Nome', {exact:true}).fill('Tiros 200 m');
+  await choose('Rodagem');
+  assert.equal(await title(), 'Tiros 200 m', 'manual model-like title is still customized');
+  await p.getByLabel('Nome', {exact:true}).fill('Série de quarta-feira');
+  await choose('Tiros');
+  assert.equal(await title(), 'Série de quarta-feira');
+  await button('Cancelar').click();
+  const errors = await tab.dev.logs({levels:['error'], limit:100});
+  assert.equal(errors.length, 0, 'browser console has no errors');
+  return {scenarios:['A: toast and dialog', 'B: automatic title', 'C: custom title and persistence', 'D: model title'], consoleErrors:errors.length};
+}

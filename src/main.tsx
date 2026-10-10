@@ -1,4 +1,4 @@
-import {useState, useEffect, type ReactNode} from 'react';
+import {useState, useEffect, useLayoutEffect, type ReactNode} from 'react';
 import {createRoot} from 'react-dom/client';
 import {Home, Users, CalendarDays, MoreHorizontal, Plus, ChevronRight, ChevronLeft, ArrowLeft, ArrowRight, Search, SlidersHorizontal, Cake, Flag, Wallet, Layers, Copy, Check, LogOut, Heart, X} from 'lucide-react';
 import {students as seed, templates, initialSchedule, summary, initials, dateLabel, money, today, days, dayNames, weekDate, shortDate, scheduleKey, normalize, assessments, emptyStudent, type Student, type Workout, type Schedule} from './data';
@@ -33,6 +33,9 @@ function App() {
   const [moreDetail,setMoreDetail] = useState(''), [showCpf,setShowCpf] = useState(false), [login,setLogin] = useState(false);
   const [sheet,setSheet] = useState<Sheet>(null), [editor,setEditor] = useState<{day:number;workout:Workout;existing:boolean}|null>(null);
   const [studentForm,setStudentForm] = useState<{student:Student;step:number}|null>(null), [toast,setToast] = useState<{message:string}|null>(null);
+  useLayoutEffect(() => {
+    if (sheet || editor || studentForm) setToast(null);
+  }, [sheet, editor, studentForm]);
   const student = people.find(p => p.id === selected) || people[0];
   const active = people.filter(p => p.status === 'Ativo');
   const todayAthletes = active.filter(p => (schedule[scheduleKey(p.id,0,3)] || []).length > 0);
