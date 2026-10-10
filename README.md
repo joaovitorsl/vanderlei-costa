@@ -20,9 +20,9 @@ https://joaovitorsl.github.io/vanderlei-costa/
 
 ## Ajustes pré-demo
 
-- Desktop: Início, Alunos e Treinos continuam principais; Agenda coletiva e Próximas provas aparecem como acessos secundários, junto de Mais. No mobile permanecem Início / Alunos / Treinos / Mais.
+- Desktop: Início, Alunos e Treinos continuam principais; Agenda coletiva, Próximas provas, Vencimentos e Aniversariantes aparecem diretamente como acessos secundários, sem Mais no desktop. No mobile permanecem Início / Alunos / Treinos / Mais.
 - Avaliações: criar, consultar, editar e excluir registros de cada aluno. Data, tipo (1600 m, 2400 m ou Outro), tempo em min:seg, FC máxima e observações opcionais. Outro revela Nome da avaliação. Não há cálculo de VO₂: os valores antigos são somente exemplos do seed e desaparecem ao editar aquele registro.
-- Aluno: labels CPF, Telefone e E-mail; objetivo Outro revela texto livre; Início na corrida registra somente o ano. Matrícula gerada ao salvar, somente leitura e preservada na edição.
+- Aluno: labels CPF, Telefone e E-mail; objetivo Outro revela texto livre; Início na corrida registra somente o ano. Matrícula oculta no novo cadastro; gerada ao salvar, visível somente depois, somente leitura e preservada na edição.
 - Agenda: Treino coletivo, Longão coletivo, Evento / confraternização e Dia livre. Título é opcional e não substitui o tipo. Dia livre não pede horário/local e informa que não há encontro coletivo; não pode coexistir com encontros na mesma data. Pode ocorrer em qualquer dia da semana, sem recorrência automática.
 - Provas: uma prova tem várias distâncias (informadas por vírgula), e cada participante escolhe uma delas. Ao remover uma distância, é necessário corrigir os participantes afetados antes de salvar. O perfil deriva a próxima prova e a distância daquele atleta.
 - Nenhum dashboard, métrica, pagamento, integração, área do atleta ou novo módulo foi acrescentado.

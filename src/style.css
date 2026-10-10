@@ -119,3 +119,6 @@ input[readonly]{color:var(--muted);background:#192117;cursor:default}
 @media(max-width:599px){.assessment-heading{align-items:flex-start;flex-wrap:wrap}.assessment-heading .primary{margin-top:2px}}
 
 @media(min-width:1000px){.secondary-page-back{display:none}}
+
+.sidebar-end .sidebar-logout{margin-left:auto;width:32px;color:#809571}
+@media(min-width:1000px){.sidebar{overflow-y:auto}.sidebar-end{padding-top:20px}}
