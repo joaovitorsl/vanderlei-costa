@@ -81,3 +81,5 @@
 @media(min-width:1000px){.sticky-footer-sheet .sheet-actions{bottom:-30px;padding:16px 30px 30px;margin:22px -30px -30px}}
 .sheet-header h2,.sheet-header p,.sheet-actions button,.data-list dd,.plan-summary h2{overflow-wrap:anywhere;min-width:0}
 @media(max-width:599px){.app:has(~ .form-overlay) .bottom-nav{visibility:hidden}}
+
+.plan-benefits{margin:18px 0}.plan-benefits p+p{margin-top:6px}.workout-location{font-size:13px;margin-top:6px;overflow-wrap:anywhere}

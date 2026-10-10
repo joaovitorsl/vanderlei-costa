@@ -1,8 +1,16 @@
+export const commercialPlans = {
+  Lite: {value:80, months:1, benefits:['Treinos às terças, quintas e domingos.', 'Um domingo livre por mês, no horário e local de sua preferência.']},
+  Fire: {value:420, months:6, benefits:['Pagamento via PIX.', 'Uniforme incluso.']},
+  Família: {value:150, months:1, benefits:['Para mais de uma pessoa da mesma família.', 'Avaliação física com peso, medidas e bioimpedância inclusa.']}
+} as const;
+export type PlanName = keyof typeof commercialPlans;
 export type Student = {
   id: string; name: string; birth: string; shirt: string; gender: string;
   cpf: string; phone: string; email: string; street: string; number: string;
   neighborhood: string; city: string; state: string; enrollment: string;
-  plan: string; value: number; due: number; status: string; level: string;
+  modality: string; plan: PlanName; renewalDate: string;
+  uniformStatus?: 'Não se aplica' | 'Pendente' | 'Entregue';
+  value: number; due: number; status: string; level: string;
   goal: string; pace: string; frequency: number; experience: string;
   availability: string; race: string; raceDate: string; raceDistance: string;
   medical: string; notes: string;
@@ -10,6 +18,7 @@ export type Student = {
 export type Workout = {
   duplicatedFromWeek?: number;
   titleCustomized?: boolean;
+  location?: string;
   id: string; type: string; title: string; warmup: number; reps: number;
   distance: number; target: string; rest: number; cooldown: number;
   pace: string; duration: number; notes: string;
@@ -33,7 +42,8 @@ export const students: Student[] = names.map((name, i) => ({
   cpf: '000.000.000-00', phone: '(00) 00000-0000', email: `aluno${i + 1}@example.com`,
   street: 'Rua Exemplo', number: String(100 + i), neighborhood: 'Bairro Modelo', city: 'Cidade Exemplo', state: 'CE',
   enrollment: `2026-${String(i + 1).padStart(3, '0')}`,
-  plan: i === 9 ? 'Musculação' : i === 11 ? 'Outros' : 'Corrida', value: [80,80,60][i % 3],
+  modality:'Corrida de rua', plan: (['Lite','Fire','Família'] as const)[i % 3], value:[80,420,150][i % 3],
+  renewalDate:`2026-10-${String([10,10,12,20,20,25,25,20,25,20,25,25][i]).padStart(2,'0')}`,
   due: [10,10,12,20,20,25,25,20,25,20,25,25][i], status: i === 11 ? 'Pausado' : 'Ativo',
   level: ['Intermediário','Avançado','Iniciante'][i % 3], goal: ['10 km','21 km','5 km'][i % 3],
   pace: ['5:45','4:50','6:30'][i % 3], frequency: 3, experience: ['2 anos','4 anos','6 meses'][i % 3],
@@ -54,7 +64,7 @@ export const templates: Workout[] = [
   {...base, id:'t6', type:'Intervalado por tempo', title:'Intervalado por tempo', reps:8, duration:2}
 ];
 export const initialSchedule: Schedule = {};
-for (const student of students.filter(s => s.plan === 'Corrida' && s.status === 'Ativo')) {
+for (const student of students.filter(s => s.modality === 'Corrida de rua' && s.status === 'Ativo')) {
   for (let week = -1; week <= 1; week++) {
     for (const day of days) {
       if (week === 0 && day === 3 && Number(student.id) > 4) continue;
@@ -62,6 +72,25 @@ for (const student of students.filter(s => s.plan === 'Corrida' && s.status === 
       initialSchedule[scheduleKey(student.id, week, day)] = [{...templates[day === 6 ? 1 : day === 3 ? 2 : 0], id:`${student.id}-${week}-${day}`}];
     }
   }
+}
+// Illustrative locations and one manually planned free Sunday; no monthly automation.
+initialSchedule['2:0:1'][0].location = 'Açude Velho';
+initialSchedule['2:0:3'][0].location = 'Plínio Lemos';
+initialSchedule['1:1:6'][0] = {...initialSchedule['1:1:6'][0], title:'Treino livre', titleCustomized:true, notes:'Faça no horário e local de sua preferência.'};
+export const planPrice = (student: Pick<Student, 'plan' | 'value'>) => `${money(student.value)} / ${commercialPlans[student.plan].months === 6 ? '6 meses' : 'mês'}`;
+export const renewalLabel = (student: Pick<Student, 'plan' | 'due' | 'renewalDate'>) => student.plan === 'Fire'
+  ? (student.renewalDate && Number.isFinite(new Date(student.renewalDate+'T12:00:00').getTime()) ? shortDate(new Date(student.renewalDate+'T12:00:00')) : 'Não informada')
+  : (student.due ? `Dia ${student.due}` : 'Não informado');
+export const dueDayThisMonth = (student: Pick<Student, 'plan' | 'due' | 'renewalDate'>) => student.plan === 'Fire'
+  ? (student.renewalDate?.startsWith('2026-10-') ? Number(student.renewalDate.slice(8,10)) : 0) : student.due;
+
+// Adapt previous demo records without resetting names, notes, workouts or custom data.
+export function normalizeStudent(student: Student): Student {
+  const knownPlan = Object.hasOwn(commercialPlans, student.plan);
+  const plan = knownPlan ? student.plan : students.find(seed => seed.id === student.id)?.plan || 'Lite';
+  return {...student, modality:student.modality || 'Corrida de rua', plan,
+    value:knownPlan ? student.value : commercialPlans[plan].value,
+    renewalDate:student.renewalDate ?? (student.due ? `2026-10-${String(student.due).padStart(2,'0')}` : '')};
 }
 export const summary = (w: Workout) => w.type === 'Rodagem'
   ? `${w.distance} km · ${w.pace}/km`
@@ -74,6 +103,6 @@ export const assessments = [
 ];
 export function emptyStudent(count: number): Student {
   return {...students[0], id: crypto.randomUUID(), name:'', birth:'', email:'', street:'', number:'', neighborhood:'', city:'', state:'',
-    enrollment:`2026-${String(count + 1).padStart(3, '0')}`, plan:'Corrida', value:80, due:10, status:'Ativo',
+    enrollment:`2026-${String(count + 1).padStart(3, '0')}`, modality:'Corrida de rua', plan:'Lite', value:80, renewalDate:'', due:10, status:'Ativo',
     race:'', raceDate:'', raceDistance:'', medical:'', notes:''};
 }
